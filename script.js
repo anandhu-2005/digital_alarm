@@ -1,4 +1,4 @@
-const WEATHER_API_KEY = "6164f47729434b4dca9bbb9baa5e2472"; // OpenWeather API key
+const WEATHER_API_KEY = "6164f47729434b4dca9bbb9baa5e2472";
 const CITY = "Kerala";
 
 const alarmSound = document.getElementById("alarmSound");
@@ -9,7 +9,8 @@ const quoteText = document.getElementById("quote");
 const ampmSelect = document.getElementById("ampm");
 const ampmDisplay = document.getElementById("ampmDisplay");
 
-// Update display when user changes AM/PM
+// Show selected AM/PM under the dropdown
+ampmDisplay.textContent = ampmSelect.value;
 ampmSelect.addEventListener("change", () => {
   ampmDisplay.textContent = ampmSelect.value;
 });
@@ -17,11 +18,11 @@ ampmSelect.addEventListener("change", () => {
 let alarmTime = null;
 let alarmSet = false;
 
-// Set Alarm
+// Unlock audio and set alarm
 document.getElementById("setAlarmBtn").addEventListener("click", () => {
   const hour = parseInt(document.getElementById("alarmHour").value);
   const minute = parseInt(document.getElementById("alarmMinute").value);
-  const ampm = document.getElementById("ampm").value;
+  const ampm = ampmSelect.value;
 
   if (isNaN(hour) || isNaN(minute) || hour < 1 || hour > 12 || minute < 0 || minute > 59) {
     alert("Please enter a valid time!");
@@ -33,11 +34,13 @@ document.getElementById("setAlarmBtn").addEventListener("click", () => {
   statusText.textContent = `Alarm set for ${alarmTime}`;
 
   // Unlock audio for mobile
-  alarmSound.play().then(()=>{ alarmSound.pause(); alarmSound.currentTime = 0; })
-             .catch(err=>console.log("Audio unlock failed:", err));
+  alarmSound.play().then(()=>{ 
+      alarmSound.pause(); 
+      alarmSound.currentTime = 0; 
+  }).catch(err=>console.log("Audio unlock failed:", err));
 });
 
-// Stop Alarm
+// Stop alarm
 document.getElementById("stopAlarmBtn").addEventListener("click", () => {
   alarmSound.pause();
   alarmSound.currentTime = 0;
@@ -51,7 +54,7 @@ setInterval(() => {
   const now = new Date();
   let hours = now.getHours();
   const minutes = now.getMinutes();
-  const currentAMPM = hours >= 12 ? "PM":"AM";
+  const currentAMPM = hours >= 12 ? "PM" : "AM";
   hours = hours % 12 || 12;
 
   const currentTime = `${hours.toString().padStart(2,"0")}:${minutes.toString().padStart(2,"0")} ${currentAMPM}`;
@@ -62,8 +65,8 @@ setInterval(() => {
   }
 }, 1000);
 
-// Ring Alarm
-function ringAlarm(){
+// Ring alarm
+function ringAlarm() {
   statusText.textContent = "⏰ Alarm ringing!";
   alarmSound.loop = true;
   alarmSound.play();
@@ -72,7 +75,7 @@ function ringAlarm(){
   fetchQuote();
 }
 
-// Fetch Weather
+// Fetch weather
 async function fetchWeather(){
   try {
     const url = `https://api.openweathermap.org/data/2.5/weather?q=${CITY}&appid=${WEATHER_API_KEY}&units=metric`;
@@ -85,7 +88,7 @@ async function fetchWeather(){
   }
 }
 
-// Fetch Quote
+// Fetch quote
 async function fetchQuote(){
   try {
     const res = await fetch("https://api.allorigins.win/get?url=" + encodeURIComponent("https://zenquotes.io/api/random"));
