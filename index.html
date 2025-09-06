@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Alarm Clock</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<div class="bubble"></div>
+<div class="bubble"></div>
+<div class="bubble"></div>
+<div class="bubble"></div>
+
+<body>
+  <div class="container">
+    <h1>⏰ Smart Alarm Clock</h1>
+    <p>Set an alarm and wake up with weather + motivation!</p>
+
+    <label for="alarmTime">Choose alarm time:</label>
+    <input type="time" id="alarmTime">
+
+    <button id="setAlarmBtn">Set Alarm</button>
+    <p id="status"></p>
+
+    <div id="info" class="hidden">
+      <h2>🌦 Weather</h2>
+      <p id="weather"></p>
+
+      <h2>🌟 Quote of the Day</h2>
+      <p id="quote"></p>
+    </div>
+  </div>
+  
+  <!-- Alarm sound -->
+  <audio id="alarmSound" src="alarm.mp3" preload="auto"></audio>
+
+  <script src="script.js"></script>
+</body>
+</html>
