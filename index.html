@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Smart Alarm Clock</title>
+  <title>Smart Alarm Clock 12hr</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -13,15 +13,28 @@
   <div class="bubble"></div>
   <div class="bubble"></div>
 
-  <!-- Main container -->
   <div class="container">
     <h1>⏰ Smart Alarm Clock</h1>
     <p>Set an alarm and wake up with weather + motivation!</p>
 
-    <label for="alarmTime">Choose alarm time:</label>
-    <input type="time" id="alarmTime">
+    <label for="alarmHour">Hour:</label>
+    <input type="number" id="alarmHour" min="1" max="12" placeholder="HH">
+
+    <label for="alarmMinute">Minute:</label>
+    <input type="number" id="alarmMinute" min="0" max="59" placeholder="MM">
+     <br>
+    <label for="ampm">AM/PM:</label>
+<select id="ampm">
+  <option value="AM">AM</option>
+  <option value="PM">PM</option>
+</select>
+<br>
+<span id="ampmDisplay">AM</span>
+
 
     <button id="setAlarmBtn">Set Alarm</button>
+    <button id="stopAlarmBtn">Stop Alarm</button>
+
     <p id="status"></p>
 
     <div id="info" class="hidden">
@@ -32,10 +45,8 @@
       <p id="quote"></p>
     </div>
   </div>
-  
-  <!-- Alarm sound -->
-  <audio id="alarmSound" src="alarm.mp3" preload="auto"></audio>
 
+  <audio id="alarmSound" src="alarm.mp3" preload="auto"></audio>
   <script src="script.js"></script>
 </body>
 </html>

@@ -1,82 +1,102 @@
 const WEATHER_API_KEY = "6164f47729434b4dca9bbb9baa5e2472"; // OpenWeather API key
-const CITY = "Kerala"; // Change city
+const CITY = "Kerala";
 
 const alarmSound = document.getElementById("alarmSound");
 const statusText = document.getElementById("status");
 const infoBox = document.getElementById("info");
 const weatherText = document.getElementById("weather");
 const quoteText = document.getElementById("quote");
+const ampmSelect = document.getElementById("ampm");
+const ampmDisplay = document.getElementById("ampmDisplay");
+
+// Update display when user changes AM/PM
+ampmSelect.addEventListener("change", () => {
+  ampmDisplay.textContent = ampmSelect.value;
+});
 
 let alarmTime = null;
 let alarmSet = false;
 
-// Unlock audio for mobile
+// Set Alarm
 document.getElementById("setAlarmBtn").addEventListener("click", () => {
-  const input = document.getElementById("alarmTime").value;
-  if (!input) {
-    alert("Please select a valid time!");
+  const hour = parseInt(document.getElementById("alarmHour").value);
+  const minute = parseInt(document.getElementById("alarmMinute").value);
+  const ampm = document.getElementById("ampm").value;
+
+  if (isNaN(hour) || isNaN(minute) || hour < 1 || hour > 12 || minute < 0 || minute > 59) {
+    alert("Please enter a valid time!");
     return;
   }
 
-  alarmTime = input;
+  alarmTime = `${hour.toString().padStart(2,"0")}:${minute.toString().padStart(2,"0")} ${ampm}`;
   alarmSet = true;
   statusText.textContent = `Alarm set for ${alarmTime}`;
 
-  // Attempt to play audio to comply with mobile browser restrictions
-  alarmSound.play().catch(error => {
-    console.log("Audio play failed:", error);
-  });
+  // Unlock audio for mobile
+  alarmSound.play().then(()=>{ alarmSound.pause(); alarmSound.currentTime = 0; })
+             .catch(err=>console.log("Audio unlock failed:", err));
 });
 
+// Stop Alarm
+document.getElementById("stopAlarmBtn").addEventListener("click", () => {
+  alarmSound.pause();
+  alarmSound.currentTime = 0;
+  statusText.textContent = "Alarm stopped!";
+});
 
 // Check alarm every second
 setInterval(() => {
-  if (alarmSet && alarmTime) {
-    const now = new Date();
-    const currentTime = now.toTimeString().slice(0, 5); // HH:MM
-    if (currentTime === alarmTime) {
-      ringAlarm();
-      alarmSet = false; // reset
-    }
+  if (!alarmSet) return;
+
+  const now = new Date();
+  let hours = now.getHours();
+  const minutes = now.getMinutes();
+  const currentAMPM = hours >= 12 ? "PM":"AM";
+  hours = hours % 12 || 12;
+
+  const currentTime = `${hours.toString().padStart(2,"0")}:${minutes.toString().padStart(2,"0")} ${currentAMPM}`;
+
+  if (currentTime === alarmTime) {
+    ringAlarm();
+    alarmSet = false;
   }
 }, 1000);
 
-// Ring alarm
-function ringAlarm() {
+// Ring Alarm
+function ringAlarm(){
   statusText.textContent = "⏰ Alarm ringing!";
+  alarmSound.loop = true;
   alarmSound.play();
   infoBox.classList.remove("hidden");
   fetchWeather();
   fetchQuote();
 }
 
-// Fetch weather from OpenWeather
-async function fetchWeather() {
+// Fetch Weather
+async function fetchWeather(){
   try {
     const url = `https://api.openweathermap.org/data/2.5/weather?q=${CITY}&appid=${WEATHER_API_KEY}&units=metric`;
     const res = await fetch(url);
-    if (!res.ok) throw new Error("Failed to fetch weather data");
+    if(!res.ok) throw new Error("Weather fetch failed");
     const data = await res.json();
     weatherText.textContent = `${data.name}: ${data.main.temp}°C, ${data.weather[0].description}`;
-  } catch (err) {
+  } catch {
     weatherText.textContent = "Could not fetch weather 😢";
-    console.error("Weather fetch error:", err);
   }
 }
 
-async function fetchQuote() {
+// Fetch Quote
+async function fetchQuote(){
   try {
     const res = await fetch("https://api.allorigins.win/get?url=" + encodeURIComponent("https://zenquotes.io/api/random"));
-    if (!res.ok) throw new Error("Failed to fetch quote");
+    if(!res.ok) throw new Error("Quote fetch failed");
     const data = await res.json();
     const parsed = JSON.parse(data.contents);
     quoteText.textContent = `"${parsed[0].q}" — ${parsed[0].a}`;
-  } catch (err) {
+  } catch {
     quoteText.textContent = "Could not fetch quote 😢";
-    console.error("Quote fetch error:", err);
   }
 }
 
-
-// Load a quote immediately on page load
+// Load a quote immediately
 fetchQuote();
