@@ -18,16 +18,16 @@ document.getElementById("setAlarmBtn").addEventListener("click", () => {
     return;
   }
 
-  // Unlock audio
-  alarmSound.play().then(() => {
-    alarmSound.pause();
-    alarmSound.currentTime = 0;
-  }).catch(err => console.log("Audio unlock failed:", err));
-
   alarmTime = input;
   alarmSet = true;
   statusText.textContent = `Alarm set for ${alarmTime}`;
+
+  // Attempt to play audio to comply with mobile browser restrictions
+  alarmSound.play().catch(error => {
+    console.log("Audio play failed:", error);
+  });
 });
+
 
 // Check alarm every second
 setInterval(() => {
@@ -55,26 +55,28 @@ async function fetchWeather() {
   try {
     const url = `https://api.openweathermap.org/data/2.5/weather?q=${CITY}&appid=${WEATHER_API_KEY}&units=metric`;
     const res = await fetch(url);
+    if (!res.ok) throw new Error("Failed to fetch weather data");
     const data = await res.json();
     weatherText.textContent = `${data.name}: ${data.main.temp}°C, ${data.weather[0].description}`;
-  } catch {
+  } catch (err) {
     weatherText.textContent = "Could not fetch weather 😢";
+    console.error("Weather fetch error:", err);
   }
 }
 
-// Fetch quote from ZenQuotes via AllOrigins
 async function fetchQuote() {
   try {
-    const res = await fetch(
-      "https://api.allorigins.win/get?url=" + encodeURIComponent("https://zenquotes.io/api/random")
-    );
+    const res = await fetch("https://api.allorigins.win/get?url=" + encodeURIComponent("https://zenquotes.io/api/random"));
+    if (!res.ok) throw new Error("Failed to fetch quote");
     const data = await res.json();
     const parsed = JSON.parse(data.contents);
     quoteText.textContent = `"${parsed[0].q}" — ${parsed[0].a}`;
-  } catch {
+  } catch (err) {
     quoteText.textContent = "Could not fetch quote 😢";
+    console.error("Quote fetch error:", err);
   }
 }
+
 
 // Load a quote immediately on page load
 fetchQuote();
