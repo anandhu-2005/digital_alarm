@@ -9,7 +9,7 @@ const quoteText = document.getElementById("quote");
 const ampmSelect = document.getElementById("ampm");
 const ampmDisplay = document.getElementById("ampmDisplay");
 
-// Show selected AM/PM under the dropdown
+// Live AM/PM display
 ampmDisplay.textContent = ampmSelect.value;
 ampmSelect.addEventListener("change", () => {
   ampmDisplay.textContent = ampmSelect.value;
@@ -17,8 +17,9 @@ ampmSelect.addEventListener("change", () => {
 
 let alarmTime = null;
 let alarmSet = false;
+let audioUnlocked = false;
 
-// Unlock audio and set alarm
+// Set Alarm
 document.getElementById("setAlarmBtn").addEventListener("click", () => {
   const hour = parseInt(document.getElementById("alarmHour").value);
   const minute = parseInt(document.getElementById("alarmMinute").value);
@@ -33,21 +34,24 @@ document.getElementById("setAlarmBtn").addEventListener("click", () => {
   alarmSet = true;
   statusText.textContent = `Alarm set for ${alarmTime}`;
 
-  // Unlock audio for mobile
-  alarmSound.play().then(()=>{ 
-      alarmSound.pause(); 
-      alarmSound.currentTime = 0; 
-  }).catch(err=>console.log("Audio unlock failed:", err));
+  // Unlock audio on mobile
+  if (!audioUnlocked) {
+    alarmSound.play().then(() => {
+      audioUnlocked = true;
+      alarmSound.pause();
+      alarmSound.currentTime = 0;
+    }).catch(err => console.log("Audio unlock failed:", err));
+  }
 });
 
-// Stop alarm
+// Stop Alarm
 document.getElementById("stopAlarmBtn").addEventListener("click", () => {
   alarmSound.pause();
   alarmSound.currentTime = 0;
   statusText.textContent = "Alarm stopped!";
 });
 
-// Check alarm every second
+// Check Alarm every second
 setInterval(() => {
   if (!alarmSet) return;
 
@@ -58,14 +62,13 @@ setInterval(() => {
   hours = hours % 12 || 12;
 
   const currentTime = `${hours.toString().padStart(2,"0")}:${minutes.toString().padStart(2,"0")} ${currentAMPM}`;
-
   if (currentTime === alarmTime) {
     ringAlarm();
     alarmSet = false;
   }
 }, 1000);
 
-// Ring alarm
+// Ring Alarm
 function ringAlarm() {
   statusText.textContent = "⏰ Alarm ringing!";
   alarmSound.loop = true;
@@ -75,7 +78,7 @@ function ringAlarm() {
   fetchQuote();
 }
 
-// Fetch weather
+// Fetch Weather
 async function fetchWeather(){
   try {
     const url = `https://api.openweathermap.org/data/2.5/weather?q=${CITY}&appid=${WEATHER_API_KEY}&units=metric`;
@@ -88,7 +91,7 @@ async function fetchWeather(){
   }
 }
 
-// Fetch quote
+// Fetch Quote
 async function fetchQuote(){
   try {
     const res = await fetch("https://api.allorigins.win/get?url=" + encodeURIComponent("https://zenquotes.io/api/random"));
@@ -101,5 +104,5 @@ async function fetchQuote(){
   }
 }
 
-// Load a quote immediately
+// Load quote immediately
 fetchQuote();
