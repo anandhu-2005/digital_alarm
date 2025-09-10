@@ -93,18 +93,19 @@ async function fetchWeather(){
   }
 }
 
-// Fetch Quote
+// Fetch Quote (fixed for mobile)
 async function fetchQuote(){
   try {
-    const res = await fetch("https://api.allorigins.win/get?url=" + encodeURIComponent("https://zenquotes.io/api/random"));
+    const res = await fetch("https://zenquotes.io/api/random");
     if(!res.ok) throw new Error("Quote fetch failed");
     const data = await res.json();
-    const parsed = JSON.parse(data.contents);
-    quoteText.textContent = `"${parsed[0].q}" — ${parsed[0].a}`;
-  } catch {
+    quoteText.textContent = `"${data[0].q}" — ${data[0].a}`;
+  } catch (err) {
+    console.log(err);
     quoteText.textContent = "Could not fetch quote 😢";
   }
 }
+
 
 // Spotify Songs (Track IDs from Spotify)
 const spotifyTracks = [
