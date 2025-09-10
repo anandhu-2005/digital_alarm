@@ -74,8 +74,10 @@ function ringAlarm() {
   alarmSound.loop = true;
   alarmSound.play();
   infoBox.classList.remove("hidden");
+
   fetchWeather();
   fetchQuote();
+  fetchSpotifySong(); // 🎵 Spotify added
 }
 
 // Fetch Weather
@@ -102,6 +104,27 @@ async function fetchQuote(){
   } catch {
     quoteText.textContent = "Could not fetch quote 😢";
   }
+}
+
+// Spotify Songs (Track IDs from Spotify)
+const spotifyTracks = [
+  "4uLU6hMCjMI75M1A2tKUQC", // Eminem - Lose Yourself
+  "0VjIjW4GlUZAMYd2vXMi3b", // The Weeknd - Blinding Lights
+  "3tjFYV6RSFtuktYl3ZtYcq", // Lewis Capaldi - Someone You Loved
+  "2XU0oxnq2qxCpomAAuJY8K", // Dua Lipa - Don't Start Now
+  "7ouMYWpwJ422jRcDASZB7P"  // Ed Sheeran - Shape of You
+];
+
+function fetchSpotifySong(){
+  const randomTrack = spotifyTracks[Math.floor(Math.random() * spotifyTracks.length)];
+  const embedUrl = `https://open.spotify.com/embed/track/${randomTrack}?utm_source=generator`;
+  document.getElementById("spotifyPlayer").innerHTML = `
+    <iframe style="border-radius:12px" 
+      src="${embedUrl}" 
+      width="100%" height="152" frameBorder="0" 
+      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+      loading="lazy">
+    </iframe>`;
 }
 
 // Load quote immediately
