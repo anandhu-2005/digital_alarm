@@ -8,6 +8,7 @@ const weatherText = document.getElementById("weather");
 const quoteText = document.getElementById("quote");
 const ampmSelect = document.getElementById("ampm");
 const ampmDisplay = document.getElementById("ampmDisplay");
+const songBox = document.getElementById("spotifyPlayer");
 
 // Live AM/PM display
 ampmDisplay.textContent = ampmSelect.value;
@@ -77,7 +78,7 @@ function ringAlarm() {
 
   fetchWeather();
   fetchQuote();
-  fetchSpotifySong(); // 🎵 Spotify added
+  fetchSpotifySong();
 }
 
 // Fetch Weather
@@ -93,22 +94,25 @@ async function fetchWeather(){
   }
 }
 
-// Fetch Quote (fixed for mobile)
+
 async function fetchQuote(){
   try {
-    const res = await fetch("https://api.quotable.io/random");
-    if(!res.ok) throw new Error("Quote fetch failed");
+    const res = await fetch("https://api.allorigins.win/raw?url=https://zenquotes.io/api/random");
+    if(!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    
     const data = await res.json();
-    quoteText.textContent = `"${data.content}" — ${data.author}`;
+    quoteText.textContent = `"${data[0].q}" — ${data[0].a}`;
   } catch (err) {
-    console.log(err);
+    console.error("Quote fetch error:", err);
     quoteText.textContent = "Could not fetch quote 😢";
   }
 }
 
 
 
-// Spotify Songs (Track IDs from Spotify)
+
+
+// Spotify Songs (random track IDs)
 const spotifyTracks = [
   "4uLU6hMCjMI75M1A2tKUQC", // Eminem - Lose Yourself
   "0VjIjW4GlUZAMYd2vXMi3b", // The Weeknd - Blinding Lights
@@ -120,7 +124,7 @@ const spotifyTracks = [
 function fetchSpotifySong(){
   const randomTrack = spotifyTracks[Math.floor(Math.random() * spotifyTracks.length)];
   const embedUrl = `https://open.spotify.com/embed/track/${randomTrack}?utm_source=generator`;
-  document.getElementById("spotifyPlayer").innerHTML = `
+  songBox.innerHTML = `
     <iframe style="border-radius:12px" 
       src="${embedUrl}" 
       width="100%" height="152" frameBorder="0" 
@@ -129,5 +133,7 @@ function fetchSpotifySong(){
     </iframe>`;
 }
 
-// Load quote immediately
-fetchQuote();
+// Load quote immediately on page load
+window.addEventListener("load", () => {
+  fetchQuote();
+});
